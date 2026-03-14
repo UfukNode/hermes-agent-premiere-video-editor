@@ -1,0 +1,13 @@
+{
+  "name": "hermes-agent-premiere-video-editor",
+  "version": "1.0.0",
+  "description": "Hermes Agent driven Adobe Premiere Pro video cleanup panel",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "install:cep": "sh scripts/install_cep.sh",
+    "enable:cep-debug": "sh scripts/enable_cep_debug.sh"
+  },
+  "private": true
+}

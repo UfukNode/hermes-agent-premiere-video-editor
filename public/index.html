@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hermes Agent Premiere Video Editor</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Hermes Agent Operator</p>
+          <h1>Run Cleanup Like a Live Agent</h1>
+          <p class="lede">
+            Panel-ready operator UI for silence cuts, speech cleanup, and Premiere handoff.
+            Bottom console stays visible so the backend work is always legible.
+          </p>
+        </div>
+        <div class="hero-badge">
+          <span>Local first</span>
+          <strong>Hermes-ready</strong>
+        </div>
+      </header>
+
+      <main class="grid">
+        <section class="panel controls-panel">
+          <div class="panel-head">
+            <h2>Operator Controls</h2>
+            <p>Keep the controls minimal: choose a mode, pick EN or TR, then run.</p>
+          </div>
+
+          <form id="run-form" class="controls-form">
+            <label>
+              <span>Video Path</span>
+              <input id="videoPath" name="videoPath" type="text" placeholder="/Users/ufukyaman/Downloads/finalrevize.mp4" required>
+            </label>
+
+            <div class="two-col">
+              <label>
+                <span>Mode</span>
+                <select id="mode" name="mode">
+                  <option value="silence">Silence</option>
+                  <option value="speech-clean">Speech Clean</option>
+                  <option value="hybrid" selected>Hybrid</option>
+                </select>
+              </label>
+              <label>
+                <span>Language</span>
+                <select id="language" name="language">
+                  <option value="en" selected>EN</option>
+                  <option value="tr">TR</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              <span>Aggressiveness</span>
+              <select id="aggressiveness" name="aggressiveness">
+                <option value="low">low</option>
+                <option value="medium" selected>medium</option>
+                <option value="high">high</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Custom Filler List</span>
+              <input id="fillerWords" name="fillerWords" type="text" placeholder="uh,um,you know,i mean">
+            </label>
+
+            <div class="toggles">
+              <label class="toggle"><input id="xmlOnly" type="checkbox"> <span>XML only</span></label>
+              <label class="toggle"><input id="mp4Only" type="checkbox"> <span>MP4 only</span></label>
+              <label class="toggle"><input id="noMarkers" type="checkbox"> <span>No markers</span></label>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="primary">Run Cleanup</button>
+              <button type="button" id="openPremiereBtn" class="secondary">Open In Premiere</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel summary-panel">
+          <div class="panel-head">
+            <h2>Run Summary</h2>
+            <p>Current session metadata, output paths, and recent runs.</p>
+          </div>
+
+          <div class="summary-stack">
+            <div class="summary-card" id="sessionMeta">
+              <p class="label">No active session</p>
+              <strong>Waiting for a run</strong>
+            </div>
+
+            <div class="summary-card outputs-card">
+              <p class="label">Outputs</p>
+              <ul id="outputsList">
+                <li>XML output appears here</li>
+                <li>MP4 output appears here</li>
+              </ul>
+            </div>
+
+            <div class="summary-card">
+              <p class="label">Recent Sessions</p>
+              <ul id="recentSessions" class="recent-list">
+                <li>Loading...</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <section class="console-shell">
+        <div class="console-head">
+          <div>
+            <p class="eyebrow">Live Console</p>
+            <h2>Agent Terminal</h2>
+          </div>
+          <span id="consoleStatus" class="status-pill idle">Idle</span>
+        </div>
+        <pre id="consoleOutput" class="console-output">Waiting for operator command...</pre>
+      </section>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

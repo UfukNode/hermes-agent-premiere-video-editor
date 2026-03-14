@@ -1,0 +1,13 @@
+.DS_Store
+.idea/
+__pycache__/
+*.pyc
+
+Ekran Resmi *.png
+test_*.mp4
+test_*.xml
+test_*.fcpxml
+finalrevize_speech_clean_timeline.xml
+Test-zummtv/
+premiere-plugin/
+PREMIERE_PLUGIN.md
