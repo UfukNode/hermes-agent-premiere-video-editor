@@ -135,38 +135,6 @@ Restart Premiere Pro, then open:
 
 The terminal is expected to show Hermes Agent output during the run. That is part of the intended workflow.
 
-## Model Selection
-
-This repo does not hard-code an Opus model anymore.
-
-The Hermes stage now uses:
-
-- `HERMES_MODEL` from the environment if you provide it
-- otherwise your local Hermes Agent default model from `~/.hermes/config.yaml`
-
-That means model selection is controlled by your Hermes installation, not by the Premiere panel UI.
-
-If you want to change the active model globally, use:
-
-```bash
-hermes model
-```
-
-or:
-
-```bash
-hermes config set model.default YOUR_MODEL_ID
-```
-
-If you want to override the model only for this project session, start the backend like this:
-
-```bash
-cd /path/to/hermes-agent-premiere-video-editor
-HERMES_MODEL=YOUR_MODEL_ID npm start
-```
-
-If your Hermes provider route exposes `Hermes-4-70B` or `Hermes-4-405B`, you can point the backend at those model IDs through `HERMES_MODEL`. Availability depends on the provider route behind your Hermes setup.
-
 ## Output Strategy
 
 For the current panel flow, the main path is in-sequence application inside Premiere.
