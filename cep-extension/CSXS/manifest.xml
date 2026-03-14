@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="7.0" ExtensionBundleId="com.ufukyaman.adobeprrr.cep" ExtensionBundleVersion="1.0.0" ExtensionBundleName="HERMES CEP">
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.hermesagent.premierevideoeditor.cep" ExtensionBundleVersion="1.0.0" ExtensionBundleName="HERMES CEP">
   <ExtensionList>
-    <Extension Id="com.ufukyaman.adobeprrr.cep.panel" Version="1.0.0" />
+    <Extension Id="com.hermesagent.premierevideoeditor.cep.panel" Version="1.0.0" />
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -15,7 +15,7 @@
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="com.ufukyaman.adobeprrr.cep.panel">
+    <Extension Id="com.hermesagent.premierevideoeditor.cep.panel">
       <DispatchInfo>
         <Resources>
           <MainPath>./client/index.html</MainPath>

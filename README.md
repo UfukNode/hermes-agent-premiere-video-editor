@@ -108,7 +108,7 @@ Make sure Hermes Agent is installed and working on your machine.
 Enable CEP debug mode and install the panel:
 
 ```bash
-cd /Users/ufukyaman/WebstormProjects/adobeprrr
+cd /path/to/hermes-agent-premiere-video-editor
 npm run enable:cep-debug
 npm run install:cep
 ```
@@ -116,7 +116,7 @@ npm run install:cep
 Start the local backend:
 
 ```bash
-cd /Users/ufukyaman/WebstormProjects/adobeprrr
+cd /path/to/hermes-agent-premiere-video-editor
 npm start
 ```
 
@@ -161,7 +161,7 @@ hermes config set model.default YOUR_MODEL_ID
 If you want to override the model only for this project session, start the backend like this:
 
 ```bash
-cd /Users/ufukyaman/WebstormProjects/adobeprrr
+cd /path/to/hermes-agent-premiere-video-editor
 HERMES_MODEL=YOUR_MODEL_ID npm start
 ```
 

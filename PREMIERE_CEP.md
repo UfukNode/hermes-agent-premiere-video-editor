@@ -23,25 +23,25 @@ Why this exists:
 1. Enable CEP debug mode:
 
 ```bash
-cd /Users/ufukyaman/WebstormProjects/adobeprrr
+cd /path/to/hermes-agent-premiere-video-editor
 npm run enable:cep-debug
 ```
 
 2. Install the panel into the user CEP extensions folder:
 
 ```bash
-cd /Users/ufukyaman/WebstormProjects/adobeprrr
+cd /path/to/hermes-agent-premiere-video-editor
 npm run install:cep
 ```
 
 This links the extension into:
 
-`~/Library/Application Support/Adobe/CEP/extensions/com.ufukyaman.adobeprrr.cep`
+`~/Library/Application Support/Adobe/CEP/extensions/com.hermesagent.premierevideoeditor.cep`
 
 3. Start the local backend:
 
 ```bash
-cd /Users/ufukyaman/WebstormProjects/adobeprrr
+cd /path/to/hermes-agent-premiere-video-editor
 npm start
 ```
 

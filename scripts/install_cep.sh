@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
 
-ROOT="/Users/ufukyaman/WebstormProjects/adobeprrr"
-EXT_NAME="com.ufukyaman.adobeprrr.cep"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+EXT_NAME="com.hermesagent.premierevideoeditor.cep"
 TARGET_DIR="$HOME/Library/Application Support/Adobe/CEP/extensions"
 TARGET_PATH="$TARGET_DIR/$EXT_NAME"
 
