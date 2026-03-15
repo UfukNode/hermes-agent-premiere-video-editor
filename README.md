@@ -1,28 +1,27 @@
-# Hermes Agent Premiere Video Editor
+# Premiere Hermes Cut
 
-Hermes Agent Premiere Video Editor is a local Adobe Premiere Pro panel that runs Hermes Agent as the orchestration layer for talking-head cleanup workflows.
+Premiere Hermes Cut is a local Adobe Premiere Pro panel that runs Hermes Agent as the orchestration layer for silence cleanup workflows.
 
 The panel is designed for a simple in-editor flow:
 
 1. Select a clip in the active Premiere sequence.
-2. Choose a cleanup mode.
-3. Press `Start`.
-4. Let Hermes Agent run in the terminal.
-5. Apply the cleanup result back into the same Premiere sequence.
+2. Keep `Silence` selected.
+3. Choose a language.
+4. Press `Start`.
+5. Let Hermes Agent run in the terminal.
+6. Apply the cleanup result back into the same Premiere sequence.
 
 This project is not just a Python script and not just a Premiere panel. It is a local editing toolchain built from three parts:
 
 - a CEP panel inside Premiere Pro
 - a local Node backend that launches Hermes Agent and the cleanup pipeline
-- a deterministic video cleanup engine for silence removal and transcript-based speech cleanup
+- a deterministic video cleanup engine for silence removal
 
 ## What It Does
 
 The tool can:
 
 - remove silence from a selected clip
-- remove filler words and repeated words from speech-heavy clips
-- run a hybrid pass that combines speech cleanup and silence cleanup
 - keep Hermes Agent visible in the terminal while the edit is being prepared
 - write the result back into the active Premiere timeline instead of forcing a separate manual XML import workflow
 
@@ -44,15 +43,13 @@ The current shipping path in this repo is the CEP panel, not the UXP panel.
 
 UXP support in Premiere is still inconsistent across machines and developer tool setups. CEP is the practical fallback that works better for local installation and demos. The CEP panel is the part you should use.
 
-## Modes
+## Panel Controls
 
-The panel exposes three cleanup modes:
+The panel exposes one cleanup mode:
 
 - `Silence`
-- `Speech`
-- `Hybrid`
 
-Language selection is separate from mode selection and currently supports:
+Language selection sits next to mode selection in a separate control and currently supports:
 
 - `EN`
 - `TR`
@@ -71,7 +68,7 @@ The end-to-end runtime looks like this:
 ## Project Structure
 
 - `index.js`: local backend that launches Hermes Agent and the cleanup engine
-- `silence_cutter.py`: cleanup engine for silence, filler words, repetitions, and hybrid passes
+- `silence_cutter.py`: cleanup engine for silence cleanup
 - `premiere_bridge.py`: XML-oriented Premiere bridge for non-panel workflows
 - `cep-extension/client/index.html`: Premiere CEP panel UI
 - `cep-extension/client/main.js`: panel runtime logic
@@ -93,12 +90,6 @@ Windows and Linux are not supported in the current setup. The CEP install path, 
 - `ffmpeg`
 - `ffprobe`
 - Hermes Agent installed and authenticated locally
-
-For speech cleanup and hybrid cleanup, install:
-
-```bash
-pip install faster-whisper
-```
 
 ## Installation
 
@@ -141,7 +132,7 @@ Restart Premiere Pro, then open:
 1. Keep the terminal open with `npm start`.
 2. Open the `HERMES` panel in Premiere.
 3. Select one clip in the active sequence.
-4. Choose a mode.
+4. Keep `Silence` selected.
 5. Choose a language.
 6. Press `Start`.
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HERMES Premiere Video Editor</title>
+    <title>HERMES Premiere Hermes Cut</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
@@ -13,7 +13,7 @@
           <div class="brand-mark" aria-hidden="true">⚕</div>
           <div>
             <p class="eyebrow">Hermes Agent</p>
-            <h1>Premiere Video Editor</h1>
+            <h1>Premiere Hermes Cut</h1>
           </div>
         </div>
       </header>
@@ -22,23 +22,23 @@
         <p class="intro-text">Select one timeline clip. Hermes cleans the selected clip and writes it back into the same active sequence.</p>
       </section>
 
-      <section class="card mode-card">
-        <div class="control-group">
-          <span class="label">Mode</span>
-          <div class="chip-row" id="modeRow">
-            <button class="chip is-active" data-mode="silence" type="button">Silence</button>
-            <button class="chip" data-mode="speech-clean" type="button">Speech</button>
-            <button class="chip" data-mode="hybrid" type="button">Hybrid</button>
+      <section class="dual-card-grid">
+        <div class="card compact-card mode-card">
+          <div class="control-group">
+            <span class="label">Mode</span>
+            <div class="chip-row" id="modeRow">
+              <button class="chip is-active" data-mode="silence" type="button">Silence</button>
+            </div>
           </div>
         </div>
-      </section>
 
-      <section class="card language-card">
-        <div class="control-group">
-          <span class="label">Language</span>
-          <div class="chip-row" id="languageRow">
-            <button class="chip is-active" data-language="en" type="button">EN</button>
-            <button class="chip" data-language="tr" type="button">TR</button>
+        <div class="card compact-card language-card">
+          <div class="control-group">
+            <span class="label">Language</span>
+            <div class="chip-row" id="languageRow">
+              <button class="chip is-active" data-language="en" type="button">EN</button>
+              <button class="chip" data-language="tr" type="button">TR</button>
+            </div>
           </div>
         </div>
       </section>

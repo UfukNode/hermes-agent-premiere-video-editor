@@ -19,7 +19,7 @@ The install path, helper scripts, and local command assumptions in this repo tar
 ## What The CEP Panel Does
 
 - reads the selected clip from the active Premiere sequence
-- lets you choose `Silence`, `Speech`, or `Hybrid`
+- keeps the cleanup flow focused on `Silence`
 - lets you choose `EN` or `TR`
 - sends the clip path to the local backend
 - applies the cleaned result back onto the same active sequence
@@ -61,7 +61,7 @@ npm start
 
 1. Select one clip in the active Premiere timeline
 2. Open `HERMES`
-3. Choose mode
+3. Keep `Silence` selected
 4. Choose language
 5. Click `Start`
 

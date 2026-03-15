@@ -32,6 +32,12 @@ body {
   padding: 16px;
 }
 
+.dual-card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
 .topbar,
 .card,
 .action-dock {
@@ -79,6 +85,10 @@ h1 {
 
 .card {
   padding: 16px;
+}
+
+.compact-card {
+  height: 100%;
 }
 
 .intro-card {
@@ -147,6 +157,10 @@ button {
   border-radius: 12px;
 }
 
+.compact-card .chip-row {
+  min-height: 42px;
+}
+
 .result-card {
   background: var(--panel-strong);
 }
@@ -189,5 +203,11 @@ button {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 560px) {
+  .dual-card-grid {
+    grid-template-columns: 1fr;
   }
 }
