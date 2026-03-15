@@ -9,6 +9,10 @@ const PUBLIC_DIR = path.join(ROOT, 'public');
 const PORT = Number(process.env.PORT || 4317);
 const HOST = process.env.HOST || '127.0.0.1';
 const HERMES_MODEL = process.env.HERMES_MODEL || '';
+const MAX_SESSION_LOGS = 500;
+const MAX_SESSION_COUNT = 50;
+const SESSION_RETENTION_MS = 30 * 60 * 1000;
+const SESSION_SWEEP_INTERVAL_MS = 5 * 60 * 1000;
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -20,6 +24,10 @@ const MIME_TYPES = {
 
 const sessions = new Map();
 
+function hasValue(value) {
+  return value !== undefined && value !== null && value !== '';
+}
+
 function createSession(meta) {
   const id = randomUUID();
   const session = {
@@ -28,6 +36,7 @@ function createSession(meta) {
     status: 'starting',
     startedAt: new Date().toISOString(),
     endedAt: null,
+    updatedAt: new Date().toISOString(),
     logs: [],
     outputs: {},
     listeners: new Set(),
@@ -43,6 +52,7 @@ function sanitizeSession(session, options = {}) {
     status: session.status,
     startedAt: session.startedAt,
     endedAt: session.endedAt,
+    updatedAt: session.updatedAt,
     outputs: session.outputs,
     logCount: session.logs.length,
     lastLog: session.logs[session.logs.length - 1] || null,
@@ -54,14 +64,70 @@ function sanitizeSession(session, options = {}) {
 }
 
 function pushEvent(session, payload) {
+  session.updatedAt = payload.at || new Date().toISOString();
   session.logs.push(payload);
-  if (session.logs.length > 500) {
+  if (session.logs.length > MAX_SESSION_LOGS) {
     session.logs.shift();
   }
 
   const serialized = `data: ${JSON.stringify(payload)}\n\n`;
   for (const response of session.listeners) {
     response.write(serialized);
+  }
+}
+
+function closeSessionListeners(session) {
+  for (const response of session.listeners) {
+    try {
+      response.end();
+    } catch (error) {}
+  }
+  session.listeners.clear();
+}
+
+function removeSession(sessionId) {
+  const session = sessions.get(sessionId);
+  if (!session) {
+    return;
+  }
+  closeSessionListeners(session);
+  sessions.delete(sessionId);
+}
+
+function sweepSessions() {
+  const now = Date.now();
+  const removable = [];
+
+  for (const session of sessions.values()) {
+    if (session.status === 'running' || session.status === 'starting') {
+      continue;
+    }
+
+    const finishedAt = session.endedAt ? Date.parse(session.endedAt) : Date.parse(session.updatedAt || session.startedAt);
+    if (!Number.isFinite(finishedAt) || now - finishedAt > SESSION_RETENTION_MS) {
+      removable.push(session.id);
+    }
+  }
+
+  for (const sessionId of removable) {
+    removeSession(sessionId);
+  }
+
+  if (sessions.size <= MAX_SESSION_COUNT) {
+    return;
+  }
+
+  const overflow = Array.from(sessions.values())
+    .filter((session) => session.status !== 'running' && session.status !== 'starting')
+    .sort((left, right) => {
+      const leftTime = Date.parse(left.endedAt || left.updatedAt || left.startedAt) || 0;
+      const rightTime = Date.parse(right.endedAt || right.updatedAt || right.startedAt) || 0;
+      return leftTime - rightTime;
+    });
+
+  while (sessions.size > MAX_SESSION_COUNT && overflow.length) {
+    const oldest = overflow.shift();
+    removeSession(oldest.id);
   }
 }
 
@@ -164,28 +230,28 @@ function buildProcess(body) {
     '--aggressiveness', body.aggressiveness,
   ];
 
-  if (body.fillerWords) {
+  if (hasValue(body.fillerWords)) {
     commonArgs.push('--filler-words', body.fillerWords);
   }
-  if (body.repeatGap) {
+  if (hasValue(body.repeatGap)) {
     commonArgs.push('--repeat-gap', String(body.repeatGap));
   }
-  if (body.fillerMaxDuration) {
+  if (hasValue(body.fillerMaxDuration)) {
     commonArgs.push('--filler-max-duration', String(body.fillerMaxDuration));
   }
-  if (body.padding) {
+  if (hasValue(body.padding)) {
     commonArgs.push('--padding', String(body.padding));
   }
   if (body.noMarkers) {
     commonArgs.push('--no-markers');
   }
-  if (body.threshold) {
+  if (hasValue(body.threshold)) {
     commonArgs.push('--threshold', String(body.threshold));
   }
-  if (body.minSilence) {
+  if (hasValue(body.minSilence)) {
     commonArgs.push('--min-silence', String(body.minSilence));
   }
-  if (body.outputDir) {
+  if (hasValue(body.outputDir)) {
     commonArgs.push('--output-dir', body.outputDir);
   }
 
@@ -247,6 +313,7 @@ function spawnManagedChild(session, processConfig, onClose) {
   });
 
   child.on('close', (code) => {
+    session.child = null;
     onClose(code);
   });
 }
@@ -264,7 +331,18 @@ function startRun(body) {
   session.status = 'running';
 
   if (hermesConfig) {
-    spawnManagedChild(session, hermesConfig, () => {
+    spawnManagedChild(session, hermesConfig, (code) => {
+      if (code !== 0) {
+        session.status = 'failed';
+        session.endedAt = new Date().toISOString();
+        pushEvent(session, {
+          type: 'status',
+          line: `Hermes agent stage failed with code ${code}. Cleanup stage skipped.`,
+          at: session.endedAt,
+        });
+        return;
+      }
+
       pushEvent(session, {
         type: 'status',
         line: 'Hermes agent stage finished. Starting cleanup apply stage...',
@@ -387,12 +465,12 @@ const server = http.createServer(async (request, response) => {
         provider: 'nous',
         videoPath: body.videoPath,
         fillerWords: body.fillerWords || '',
-        repeatGap: body.repeatGap || '',
-        fillerMaxDuration: body.fillerMaxDuration || '',
-        padding: body.padding || '',
-        threshold: body.threshold || '',
-        minSilence: body.minSilence || '',
-        outputDir: body.outputDir || '',
+        repeatGap: body.repeatGap ?? '',
+        fillerMaxDuration: body.fillerMaxDuration ?? '',
+        padding: body.padding ?? '',
+        threshold: body.threshold ?? '',
+        minSilence: body.minSilence ?? '',
+        outputDir: body.outputDir ?? '',
         xmlOnly: Boolean(body.xmlOnly),
         mp4Only: Boolean(body.mp4Only),
         noMarkers: Boolean(body.noMarkers),
@@ -451,6 +529,8 @@ const server = http.createServer(async (request, response) => {
 
   sendJson(response, 404, { error: 'Not found' });
 });
+
+setInterval(sweepSessions, SESSION_SWEEP_INTERVAL_MS).unref();
 
 server.listen(PORT, HOST, () => {
   console.log(`hermes premiere video editor ready at http://${HOST}:${PORT}`);

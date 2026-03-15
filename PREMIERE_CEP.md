@@ -10,6 +10,12 @@ Why this exists:
 - CEP is older, but it is often the more practical fallback for stable Premiere builds
 - the Python cleanup backend stays the same
 
+## Platform Support
+
+This CEP setup is macOS-only right now.
+
+The install path, helper scripts, and local command assumptions in this repo target macOS. Windows and Linux are out of scope for the current panel installer.
+
 ## What The CEP Panel Does
 
 - reads the selected clip from the active Premiere sequence

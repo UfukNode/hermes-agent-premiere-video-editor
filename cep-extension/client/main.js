@@ -15,7 +15,8 @@
   var currentSelection = null;
   var currentMode = 'silence';
   var currentLanguage = 'en';
-  var currentPollTimer = null;
+  var currentSessionId = null;
+  var currentSessionStream = null;
 
   function updateActiveButtons(group, attr, value) {
     var buttons = group.querySelectorAll('.chip');
@@ -71,10 +72,10 @@
     runLabel.textContent = label || (isRunning ? 'Running...' : 'Start');
   }
 
-  function stopPolling() {
-    if (currentPollTimer) {
-      clearInterval(currentPollTimer);
-      currentPollTimer = null;
+  function stopSessionStream() {
+    if (currentSessionStream) {
+      currentSessionStream.close();
+      currentSessionStream = null;
     }
   }
 
@@ -86,7 +87,7 @@
 
   function refreshSelection() {
     setStatus('Checking Selection', 'Reading the current Premiere timeline selection.');
-    cs.evalScript('adobeprrr_getSelectedClipContext()', function (result) {
+    cs.evalScript('hermes_getSelectedClipContext()', function (result) {
       if (!result || result === 'NO_SELECTION') {
         currentSelection = null;
         setStatus('Select a Clip', 'Select one timeline clip, then use Start or Refresh again.');
@@ -125,7 +126,7 @@
 
     setStatus('Applying in Premiere', 'Hermes is writing the cleanup result back into the active sequence.');
     cs.evalScript(
-      "adobeprrr_applyCleanupPlanToSelection('" + escapeForEvalScript(JSON.stringify(payload)) + "')",
+      "hermes_applyCleanupPlanToSelection('" + escapeForEvalScript(JSON.stringify(payload)) + "')",
       function (result) {
         if (!result) {
           setRunningState(false, 'Retry');
@@ -145,33 +146,80 @@
     );
   }
 
-  function pollSession(sessionId) {
-    stopPolling();
-    currentPollTimer = setInterval(function () {
-      http('GET', SESSION_URL + sessionId, null, function (status, payload) {
-        if (status < 200 || status >= 300 || !payload.session) {
-          return;
-        }
+  function handleCompletedSession(session) {
+    stopSessionStream();
+    if (session.outputs && session.outputs.plan) {
+      applyPlanInPremiere(session.outputs.plan);
+      return;
+    }
+    setRunningState(false, 'Retry');
+    setStatus('Run Complete', 'Cleanup finished but no Premiere plan data was returned.');
+  }
 
-        var session = payload.session;
-        if (session.status === 'completed') {
-          stopPolling();
-          if (session.outputs && session.outputs.plan) {
-            applyPlanInPremiere(session.outputs.plan);
-            return;
-          }
-          setRunningState(false, 'Retry');
-          setStatus('Run Complete', 'Cleanup finished but no Premiere plan data was returned.');
-          return;
-        }
+  function handleFailedSession(session) {
+    stopSessionStream();
+    setRunningState(false, 'Retry');
+    setStatus('Run Failed', (session.lastLog && session.lastLog.line) || 'Cleanup failed.');
+  }
 
-        if (session.status === 'failed' || session.status === 'error') {
-          stopPolling();
-          setRunningState(false, 'Retry');
-          setStatus('Run Failed', (session.lastLog && session.lastLog.line) || 'Cleanup failed.');
-        }
-      });
-    }, 1200);
+  function readSessionSnapshot(sessionId, allowReconnect) {
+    http('GET', SESSION_URL + sessionId, null, function (status, payload) {
+      if (status < 200 || status >= 300 || !payload.session) {
+        stopSessionStream();
+        setRunningState(false, 'Retry');
+        setStatus('Run Failed', 'Could not read the final cleanup session state.');
+        return;
+      }
+
+      if (payload.session.status === 'completed') {
+        handleCompletedSession(payload.session);
+        return;
+      }
+
+      if (allowReconnect && (payload.session.status === 'running' || payload.session.status === 'starting')) {
+        setStatus('Hermes Running', currentMode + ' mode is still processing the selected clip.');
+        streamSession(sessionId);
+        return;
+      }
+
+      handleFailedSession(payload.session);
+    });
+  }
+
+  function handleSessionEvent(sessionId, payload) {
+    if (!payload || payload.type !== 'status') {
+      return;
+    }
+
+    if (payload.line === 'Hermes agent stage finished. Starting cleanup apply stage...') {
+      setStatus('Building Cleanup Plan', 'Hermes finished. The cleanup engine is preparing the Premiere apply plan.');
+      return;
+    }
+
+    if (payload.line.indexOf('Hermes agent stage failed') === 0 || payload.line.indexOf('Process exited with code') === 0) {
+      readSessionSnapshot(sessionId);
+    }
+  }
+
+  function streamSession(sessionId) {
+    stopSessionStream();
+    currentSessionId = sessionId;
+    currentSessionStream = new EventSource(SESSION_URL + sessionId + '/events');
+
+    currentSessionStream.onmessage = function (event) {
+      var payload = parseJson(event.data);
+      handleSessionEvent(sessionId, payload);
+    };
+
+    currentSessionStream.onerror = function () {
+      if (!currentSessionStream) {
+        return;
+      }
+
+      if (currentSessionId === sessionId && currentSessionStream.readyState === 2) {
+        readSessionSnapshot(sessionId, true);
+      }
+    };
   }
 
   function runCleanup() {
@@ -183,7 +231,7 @@
     ensureBackend(function (ok) {
       if (!ok) {
         setRunningState(false, 'Retry');
-        setStatus('Backend Offline', 'The terminal must keep `npm start` running.');
+        setStatus('Backend Offline', 'The terminal must keep npm start running.');
         return;
       }
 
@@ -206,7 +254,7 @@
           return;
         }
 
-        pollSession(response.session.id);
+        streamSession(response.session.id);
       });
     });
   }
@@ -230,6 +278,7 @@
 
   refreshButton.addEventListener('click', refreshSelection);
   runButton.addEventListener('click', runCleanup);
+  window.addEventListener('beforeunload', stopSessionStream);
 
   setRunningState(false, 'Start');
   refreshSelection();

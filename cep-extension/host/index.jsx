@@ -1,11 +1,11 @@
-function adobeprrr_escapeResult(value) {
+function hermes_escapeResult(value) {
     if (value === undefined || value === null) {
         return "";
     }
     return String(value);
 }
 
-function adobeprrr_collectionLength(collection) {
+function hermes_collectionLength(collection) {
     if (!collection) {
         return 0;
     }
@@ -21,17 +21,17 @@ function adobeprrr_collectionLength(collection) {
     return 0;
 }
 
-function adobeprrr_collectionItem(collection, index) {
+function hermes_collectionItem(collection, index) {
     if (!collection) {
         return null;
     }
     return collection[index] || collection[index + 1] || null;
 }
 
-function adobeprrr_findTrackIndex(tracks, targetTrack) {
-    var count = adobeprrr_collectionLength(tracks);
+function hermes_findTrackIndex(tracks, targetTrack) {
+    var count = hermes_collectionLength(tracks);
     for (var index = 0; index < count; index += 1) {
-        var track = adobeprrr_collectionItem(tracks, index);
+        var track = hermes_collectionItem(tracks, index);
         if (track === targetTrack) {
             return index;
         }
@@ -39,24 +39,24 @@ function adobeprrr_findTrackIndex(tracks, targetTrack) {
     return -1;
 }
 
-function adobeprrr_findTrackIndexForClip(tracks, mediaPath, clipStart, clipEnd) {
-    var trackCount = adobeprrr_collectionLength(tracks);
+function hermes_findTrackIndexForClip(tracks, mediaPath, clipStart, clipEnd) {
+    var trackCount = hermes_collectionLength(tracks);
     for (var trackIndex = 0; trackIndex < trackCount; trackIndex += 1) {
-        var track = adobeprrr_collectionItem(tracks, trackIndex);
+        var track = hermes_collectionItem(tracks, trackIndex);
         if (!track || !track.clips) {
             continue;
         }
 
-        var clipCount = adobeprrr_collectionLength(track.clips);
+        var clipCount = hermes_collectionLength(track.clips);
         for (var clipIndex = 0; clipIndex < clipCount; clipIndex += 1) {
-            var clip = adobeprrr_collectionItem(track.clips, clipIndex);
+            var clip = hermes_collectionItem(track.clips, clipIndex);
             if (!clip || !clip.projectItem) {
                 continue;
             }
 
-            var itemPath = adobeprrr_mediaPathFromTrackItem(clip);
-            var start = adobeprrr_secondsFromTime(clip.start);
-            var end = adobeprrr_secondsFromTime(clip.end);
+            var itemPath = hermes_mediaPathFromTrackItem(clip);
+            var start = hermes_secondsFromTime(clip.start);
+            var end = hermes_secondsFromTime(clip.end);
             if (itemPath === mediaPath && Math.abs(start - clipStart) < 0.05 && Math.abs(end - clipEnd) < 0.05) {
                 return trackIndex;
             }
@@ -65,17 +65,17 @@ function adobeprrr_findTrackIndexForClip(tracks, mediaPath, clipStart, clipEnd) 
     return -1;
 }
 
-function adobeprrr_mediaPathFromTrackItem(trackItem) {
+function hermes_mediaPathFromTrackItem(trackItem) {
     if (!trackItem || !trackItem.projectItem) {
         return "";
     }
     if (typeof trackItem.projectItem.getMediaPath !== "function") {
         return "";
     }
-    return adobeprrr_escapeResult(trackItem.projectItem.getMediaPath());
+    return hermes_escapeResult(trackItem.projectItem.getMediaPath());
 }
 
-function adobeprrr_secondsFromTime(timeValue) {
+function hermes_secondsFromTime(timeValue) {
     if (!timeValue) {
         return 0;
     }
@@ -88,27 +88,27 @@ function adobeprrr_secondsFromTime(timeValue) {
     return 0;
 }
 
-function adobeprrr_getSelectedTrackItem(sequence) {
+function hermes_getSelectedTrackItem(sequence) {
     var selection = sequence.getSelection();
-    var selectionCount = adobeprrr_collectionLength(selection);
+    var selectionCount = hermes_collectionLength(selection);
     if (selection && selectionCount > 0) {
         for (var index = 0; index < selectionCount; index += 1) {
-            var selectedItem = adobeprrr_collectionItem(selection, index);
+            var selectedItem = hermes_collectionItem(selection, index);
             if (selectedItem && selectedItem.projectItem) {
                 return selectedItem;
             }
         }
     }
 
-    var videoTrackCount = adobeprrr_collectionLength(sequence.videoTracks);
+    var videoTrackCount = hermes_collectionLength(sequence.videoTracks);
     for (var trackIndex = 0; trackIndex < videoTrackCount; trackIndex += 1) {
-        var videoTrack = adobeprrr_collectionItem(sequence.videoTracks, trackIndex);
+        var videoTrack = hermes_collectionItem(sequence.videoTracks, trackIndex);
         if (!videoTrack || !videoTrack.clips) {
             continue;
         }
-        var clipCount = adobeprrr_collectionLength(videoTrack.clips);
+        var clipCount = hermes_collectionLength(videoTrack.clips);
         for (var clipIndex = 0; clipIndex < clipCount; clipIndex += 1) {
-            var clip = adobeprrr_collectionItem(videoTrack.clips, clipIndex);
+            var clip = hermes_collectionItem(videoTrack.clips, clipIndex);
             if (clip && typeof clip.isSelected === "function" && clip.isSelected()) {
                 return clip;
             }
@@ -118,14 +118,14 @@ function adobeprrr_getSelectedTrackItem(sequence) {
     return null;
 }
 
-function adobeprrr_getSelectedTrackItems(sequence) {
+function hermes_getSelectedTrackItems(sequence) {
     var items = [];
     var selection = sequence.getSelection();
-    var selectionCount = adobeprrr_collectionLength(selection);
+    var selectionCount = hermes_collectionLength(selection);
 
     if (selection && selectionCount > 0) {
         for (var index = 0; index < selectionCount; index += 1) {
-            var selectedItem = adobeprrr_collectionItem(selection, index);
+            var selectedItem = hermes_collectionItem(selection, index);
             if (selectedItem && selectedItem.projectItem) {
                 items.push(selectedItem);
             }
@@ -136,30 +136,30 @@ function adobeprrr_getSelectedTrackItems(sequence) {
         return items;
     }
 
-    var fallback = adobeprrr_getSelectedTrackItem(sequence);
+    var fallback = hermes_getSelectedTrackItem(sequence);
     if (fallback) {
         items.push(fallback);
     }
     return items;
 }
 
-function adobeprrr_findSelectedTrackMediaPath(sequence, tracks) {
-    var trackCount = adobeprrr_collectionLength(tracks);
+function hermes_findSelectedTrackMediaPath(sequence, tracks) {
+    var trackCount = hermes_collectionLength(tracks);
     for (var trackIndex = 0; trackIndex < trackCount; trackIndex += 1) {
-        var track = adobeprrr_collectionItem(tracks, trackIndex);
+        var track = hermes_collectionItem(tracks, trackIndex);
         if (!track || !track.clips) {
             continue;
         }
 
-        var clipCount = adobeprrr_collectionLength(track.clips);
+        var clipCount = hermes_collectionLength(track.clips);
         for (var clipIndex = 0; clipIndex < clipCount; clipIndex += 1) {
-            var clip = adobeprrr_collectionItem(track.clips, clipIndex);
+            var clip = hermes_collectionItem(track.clips, clipIndex);
             if (!clip || typeof clip.isSelected !== "function") {
                 continue;
             }
 
             if (clip.isSelected()) {
-                var mediaPath = adobeprrr_mediaPathFromTrackItem(clip);
+                var mediaPath = hermes_mediaPathFromTrackItem(clip);
                 if (mediaPath) {
                     return mediaPath;
                 }
@@ -169,7 +169,7 @@ function adobeprrr_findSelectedTrackMediaPath(sequence, tracks) {
     return "";
 }
 
-function adobeprrr_getSelectedMediaPath() {
+function hermes_getSelectedMediaPath() {
     try {
         if (!app || !app.project) {
             return "ERROR: Premiere project is not available.";
@@ -181,23 +181,23 @@ function adobeprrr_getSelectedMediaPath() {
         }
 
         var selection = sequence.getSelection();
-        var selectionCount = adobeprrr_collectionLength(selection);
+        var selectionCount = hermes_collectionLength(selection);
         if (selection && selectionCount > 0) {
             for (var index = 0; index < selectionCount; index += 1) {
-                var selectedItem = adobeprrr_collectionItem(selection, index);
-                var selectedMediaPath = adobeprrr_mediaPathFromTrackItem(selectedItem);
+                var selectedItem = hermes_collectionItem(selection, index);
+                var selectedMediaPath = hermes_mediaPathFromTrackItem(selectedItem);
                 if (selectedMediaPath) {
                     return selectedMediaPath;
                 }
             }
         }
 
-        var videoSelectionPath = adobeprrr_findSelectedTrackMediaPath(sequence, sequence.videoTracks);
+        var videoSelectionPath = hermes_findSelectedTrackMediaPath(sequence, sequence.videoTracks);
         if (videoSelectionPath) {
             return videoSelectionPath;
         }
 
-        var audioSelectionPath = adobeprrr_findSelectedTrackMediaPath(sequence, sequence.audioTracks);
+        var audioSelectionPath = hermes_findSelectedTrackMediaPath(sequence, sequence.audioTracks);
         if (audioSelectionPath) {
             return audioSelectionPath;
         }
@@ -208,7 +208,7 @@ function adobeprrr_getSelectedMediaPath() {
     }
 }
 
-function adobeprrr_getSelectedClipContext() {
+function hermes_getSelectedClipContext() {
     try {
         if (!app || !app.project) {
             return "ERROR: Premiere project is not available.";
@@ -219,66 +219,66 @@ function adobeprrr_getSelectedClipContext() {
             return "NO_SELECTION";
         }
 
-        var trackItem = adobeprrr_getSelectedTrackItem(sequence);
-        var mediaPath = adobeprrr_mediaPathFromTrackItem(trackItem);
+        var trackItem = hermes_getSelectedTrackItem(sequence);
+        var mediaPath = hermes_mediaPathFromTrackItem(trackItem);
         if (!trackItem || !mediaPath) {
             return "NO_SELECTION";
         }
 
         var videoTrackIndex = -1;
         var audioTrackIndex = -1;
-        var selectedItems = adobeprrr_getSelectedTrackItems(sequence);
+        var selectedItems = hermes_getSelectedTrackItems(sequence);
         for (var index = 0; index < selectedItems.length; index += 1) {
             var item = selectedItems[index];
             if (item && item.mediaType === "Video" && videoTrackIndex < 0) {
-                videoTrackIndex = adobeprrr_findTrackIndex(sequence.videoTracks, item.parentTrack);
+                videoTrackIndex = hermes_findTrackIndex(sequence.videoTracks, item.parentTrack);
             }
             if (item && item.mediaType === "Audio" && audioTrackIndex < 0) {
-                audioTrackIndex = adobeprrr_findTrackIndex(sequence.audioTracks, item.parentTrack);
+                audioTrackIndex = hermes_findTrackIndex(sequence.audioTracks, item.parentTrack);
             }
         }
 
         if (videoTrackIndex < 0 && trackItem.mediaType === "Video") {
-            videoTrackIndex = adobeprrr_findTrackIndex(sequence.videoTracks, trackItem.parentTrack);
+            videoTrackIndex = hermes_findTrackIndex(sequence.videoTracks, trackItem.parentTrack);
         }
         if (audioTrackIndex < 0 && trackItem.mediaType === "Audio") {
-            audioTrackIndex = adobeprrr_findTrackIndex(sequence.audioTracks, trackItem.parentTrack);
+            audioTrackIndex = hermes_findTrackIndex(sequence.audioTracks, trackItem.parentTrack);
         }
         if (videoTrackIndex < 0) {
-            videoTrackIndex = adobeprrr_findTrackIndexForClip(
+            videoTrackIndex = hermes_findTrackIndexForClip(
                 sequence.videoTracks,
                 mediaPath,
-                adobeprrr_secondsFromTime(trackItem.start),
-                adobeprrr_secondsFromTime(trackItem.end)
+                hermes_secondsFromTime(trackItem.start),
+                hermes_secondsFromTime(trackItem.end)
             );
         }
         if (audioTrackIndex < 0) {
-            audioTrackIndex = adobeprrr_findTrackIndexForClip(
+            audioTrackIndex = hermes_findTrackIndexForClip(
                 sequence.audioTracks,
                 mediaPath,
-                adobeprrr_secondsFromTime(trackItem.start),
-                adobeprrr_secondsFromTime(trackItem.end)
+                hermes_secondsFromTime(trackItem.start),
+                hermes_secondsFromTime(trackItem.end)
             );
         }
 
         var payload = {
             clipName: trackItem.name || trackItem.projectItem.name || "Selected Clip",
             mediaPath: mediaPath,
-            sourceIn: adobeprrr_secondsFromTime(trackItem.inPoint),
-            sourceOut: adobeprrr_secondsFromTime(trackItem.outPoint),
-            clipStart: adobeprrr_secondsFromTime(trackItem.start),
-            clipEnd: adobeprrr_secondsFromTime(trackItem.end),
+            sourceIn: hermes_secondsFromTime(trackItem.inPoint),
+            sourceOut: hermes_secondsFromTime(trackItem.outPoint),
+            clipStart: hermes_secondsFromTime(trackItem.start),
+            clipEnd: hermes_secondsFromTime(trackItem.end),
             videoTrackIndex: videoTrackIndex,
             audioTrackIndex: audioTrackIndex
         };
 
-        return adobeprrr_escapeResult(JSON.stringify(payload));
+        return hermes_escapeResult(JSON.stringify(payload));
     } catch (error) {
         return "ERROR: " + error.toString();
     }
 }
 
-function adobeprrr_getSelectionDebug() {
+function hermes_getSelectionDebug() {
     try {
         if (!app || !app.project || !app.project.activeSequence) {
             return "NO_ACTIVE_SEQUENCE";
@@ -286,11 +286,11 @@ function adobeprrr_getSelectionDebug() {
 
         var sequence = app.project.activeSequence;
         var selection = sequence.getSelection();
-        var selectionCount = adobeprrr_collectionLength(selection);
-        var videoTrackCount = adobeprrr_collectionLength(sequence.videoTracks);
-        var audioTrackCount = adobeprrr_collectionLength(sequence.audioTracks);
+        var selectionCount = hermes_collectionLength(selection);
+        var videoTrackCount = hermes_collectionLength(sequence.videoTracks);
+        var audioTrackCount = hermes_collectionLength(sequence.audioTracks);
 
-        return adobeprrr_escapeResult(
+        return hermes_escapeResult(
             "selectionCount=" + selectionCount +
             "; videoTracks=" + videoTrackCount +
             "; audioTracks=" + audioTrackCount
@@ -300,28 +300,28 @@ function adobeprrr_getSelectionDebug() {
     }
 }
 
-function adobeprrr_ticksFromSeconds(seconds) {
+function hermes_ticksFromSeconds(seconds) {
     var value = Math.max(0, Number(seconds) || 0);
     return String(Math.round(value * 254016000000));
 }
 
-function adobeprrr_createSequenceMarker(markerCollection, marker) {
+function hermes_createSequenceMarker(markerCollection, marker) {
     if (!markerCollection || typeof markerCollection.createMarker !== "function") {
         return;
     }
 
-    var markerObject = markerCollection.createMarker(adobeprrr_secondsFromTime({ seconds: marker.timeline }));
+    var markerObject = markerCollection.createMarker(hermes_secondsFromTime({ seconds: marker.timeline }));
     if (!markerObject) {
         return;
     }
 
-    markerObject.name = marker.label || marker.reason || "Adobeprrr cut";
+    markerObject.name = marker.label || marker.reason || "HERMES cut";
     markerObject.comments = (marker.reason || "cut") + " | source " +
         Number(marker.source_start || 0).toFixed(2) + "s-" +
         Number(marker.source_end || 0).toFixed(2) + "s";
 }
 
-function adobeprrr_intersectKeepSegments(keepSegments, selection) {
+function hermes_intersectKeepSegments(keepSegments, selection) {
     var sourceIn = Math.max(0, Number(selection.sourceIn) || 0);
     var sourceOut = Math.max(sourceIn, Number(selection.sourceOut) || sourceIn);
     var segments = [];
@@ -350,8 +350,8 @@ function adobeprrr_intersectKeepSegments(keepSegments, selection) {
     return segments;
 }
 
-function adobeprrr_collectReplacementSelection(sequence, selectionContext) {
-    var items = adobeprrr_getSelectedTrackItems(sequence);
+function hermes_collectReplacementSelection(sequence, selectionContext) {
+    var items = hermes_getSelectedTrackItems(sequence);
     var mediaPath = selectionContext.mediaPath;
     var clipStart = Number(selectionContext.clipStart) || 0;
     var clipEnd = Number(selectionContext.clipEnd) || clipStart;
@@ -363,9 +363,9 @@ function adobeprrr_collectReplacementSelection(sequence, selectionContext) {
             continue;
         }
 
-        var itemPath = adobeprrr_mediaPathFromTrackItem(item);
-        var start = adobeprrr_secondsFromTime(item.start);
-        var end = adobeprrr_secondsFromTime(item.end);
+        var itemPath = hermes_mediaPathFromTrackItem(item);
+        var start = hermes_secondsFromTime(item.start);
+        var end = hermes_secondsFromTime(item.end);
         if (itemPath === mediaPath && Math.abs(start - clipStart) < 0.05 && Math.abs(end - clipEnd) < 0.05) {
             matches.push(item);
         }
@@ -375,34 +375,34 @@ function adobeprrr_collectReplacementSelection(sequence, selectionContext) {
         return matches;
     }
 
-    var primary = adobeprrr_getSelectedTrackItem(sequence);
+    var primary = hermes_getSelectedTrackItem(sequence);
     return primary ? [primary] : [];
 }
 
-function adobeprrr_findAllMatchingTrackItems(sequence, selectionContext) {
+function hermes_findAllMatchingTrackItems(sequence, selectionContext) {
     var matches = [];
     var mediaPath = selectionContext.mediaPath;
     var clipStart = Number(selectionContext.clipStart) || 0;
     var clipEnd = Number(selectionContext.clipEnd) || clipStart;
 
     function collectFromTracks(tracks) {
-        var trackCount = adobeprrr_collectionLength(tracks);
+        var trackCount = hermes_collectionLength(tracks);
         for (var trackIndex = 0; trackIndex < trackCount; trackIndex += 1) {
-            var track = adobeprrr_collectionItem(tracks, trackIndex);
+            var track = hermes_collectionItem(tracks, trackIndex);
             if (!track || !track.clips) {
                 continue;
             }
 
-            var clipCount = adobeprrr_collectionLength(track.clips);
+            var clipCount = hermes_collectionLength(track.clips);
             for (var clipIndex = 0; clipIndex < clipCount; clipIndex += 1) {
-                var clip = adobeprrr_collectionItem(track.clips, clipIndex);
+                var clip = hermes_collectionItem(track.clips, clipIndex);
                 if (!clip || !clip.projectItem) {
                     continue;
                 }
 
-                var itemPath = adobeprrr_mediaPathFromTrackItem(clip);
-                var start = adobeprrr_secondsFromTime(clip.start);
-                var end = adobeprrr_secondsFromTime(clip.end);
+                var itemPath = hermes_mediaPathFromTrackItem(clip);
+                var start = hermes_secondsFromTime(clip.start);
+                var end = hermes_secondsFromTime(clip.end);
                 if (itemPath === mediaPath && Math.abs(start - clipStart) < 0.05 && Math.abs(end - clipEnd) < 0.05) {
                     matches.push(clip);
                 }
@@ -415,7 +415,7 @@ function adobeprrr_findAllMatchingTrackItems(sequence, selectionContext) {
     return matches;
 }
 
-function adobeprrr_applyCleanupPlanToSelection(payloadJson) {
+function hermes_applyCleanupPlanToSelection(payloadJson) {
     try {
         if (!app || !app.project || !app.project.activeSequence) {
             return "ERROR: No active Premiere sequence is available.";
@@ -429,19 +429,19 @@ function adobeprrr_applyCleanupPlanToSelection(payloadJson) {
         }
 
         var sequence = app.project.activeSequence;
-        var selectedItems = adobeprrr_collectReplacementSelection(sequence, selectionContext);
+        var selectedItems = hermes_collectReplacementSelection(sequence, selectionContext);
         var trackItem = selectedItems.length ? selectedItems[0] : null;
         if (!trackItem || !trackItem.projectItem) {
             return "ERROR: Reselect the source clip before applying cleanup.";
         }
 
         var projectItem = trackItem.projectItem;
-        var mediaPath = adobeprrr_mediaPathFromTrackItem(trackItem);
+        var mediaPath = hermes_mediaPathFromTrackItem(trackItem);
         if (mediaPath !== selectionContext.mediaPath) {
             return "ERROR: Selected clip changed during analysis. Reselect the same clip and run again.";
         }
 
-        var keepSegments = adobeprrr_intersectKeepSegments(plan.keep_segments || [], selectionContext);
+        var keepSegments = hermes_intersectKeepSegments(plan.keep_segments || [], selectionContext);
         if (!keepSegments.length) {
             return "ERROR: Cleanup plan produced no usable kept segments.";
         }
@@ -449,7 +449,7 @@ function adobeprrr_applyCleanupPlanToSelection(payloadJson) {
         var videoTrackIndex = Number(selectionContext.videoTrackIndex);
         var audioTrackIndex = Number(selectionContext.audioTrackIndex);
         if (videoTrackIndex < 0) {
-            videoTrackIndex = adobeprrr_findTrackIndexForClip(
+            videoTrackIndex = hermes_findTrackIndexForClip(
                 sequence.videoTracks,
                 selectionContext.mediaPath,
                 Number(selectionContext.clipStart) || 0,
@@ -457,7 +457,7 @@ function adobeprrr_applyCleanupPlanToSelection(payloadJson) {
             );
         }
         if (audioTrackIndex < 0) {
-            audioTrackIndex = adobeprrr_findTrackIndexForClip(
+            audioTrackIndex = hermes_findTrackIndexForClip(
                 sequence.audioTracks,
                 selectionContext.mediaPath,
                 Number(selectionContext.clipStart) || 0,
@@ -468,7 +468,7 @@ function adobeprrr_applyCleanupPlanToSelection(payloadJson) {
             return "ERROR: Could not determine the selected clip track. Select both video/audio parts or reselect the clip body.";
         }
 
-        var matchedTrackItems = adobeprrr_findAllMatchingTrackItems(sequence, selectionContext);
+        var matchedTrackItems = hermes_findAllMatchingTrackItems(sequence, selectionContext);
         if (!matchedTrackItems.length) {
             matchedTrackItems = [trackItem];
         }
@@ -482,8 +482,8 @@ function adobeprrr_applyCleanupPlanToSelection(payloadJson) {
 
         for (var index = 0; index < keepSegments.length; index += 1) {
             var segment = keepSegments[index];
-            var startTicks = adobeprrr_ticksFromSeconds(segment.start);
-            var endTicks = adobeprrr_ticksFromSeconds(segment.end);
+            var startTicks = hermes_ticksFromSeconds(segment.start);
+            var endTicks = hermes_ticksFromSeconds(segment.end);
             var subclipName = (selectionContext.clipName || projectItem.name || "Clip") + " [HERMES " + (index + 1) + "]";
             var subclip = projectItem.createSubClip(
                 subclipName,
@@ -499,7 +499,7 @@ function adobeprrr_applyCleanupPlanToSelection(payloadJson) {
 
             sequence.insertClip(
                 subclip,
-                adobeprrr_ticksFromSeconds(insertionTime),
+                hermes_ticksFromSeconds(insertionTime),
                 videoTrackIndex >= 0 ? videoTrackIndex : 0,
                 audioTrackIndex >= 0 ? audioTrackIndex : 0
             );
@@ -510,7 +510,7 @@ function adobeprrr_applyCleanupPlanToSelection(payloadJson) {
             for (var markerIndex = 0; markerIndex < plan.markers.length; markerIndex += 1) {
                 var marker = plan.markers[markerIndex];
                 marker.timeline = (Number(selectionContext.clipStart) || 0) + (Number(marker.timeline) || 0);
-                adobeprrr_createSequenceMarker(sequence.markers, marker);
+                hermes_createSequenceMarker(sequence.markers, marker);
             }
         }
 

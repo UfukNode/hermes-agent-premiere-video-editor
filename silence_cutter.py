@@ -871,8 +871,10 @@ def run(
         if threshold is None or min_silence is None:
             print("  Auto-detecting silence parameters...")
             auto_threshold, auto_min_silence = auto_detect_threshold(video_path)
-            threshold = threshold or auto_threshold
-            min_silence = min_silence or auto_min_silence
+            if threshold is None:
+                threshold = auto_threshold
+            if min_silence is None:
+                min_silence = auto_min_silence
         print("  Detecting silence...")
         silence_segments = detect_silence(video_path, threshold, min_silence)
         print(f"  Silence hits: {len(silence_segments)}")

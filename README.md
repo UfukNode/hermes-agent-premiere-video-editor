@@ -78,6 +78,12 @@ The end-to-end runtime looks like this:
 - `cep-extension/host/index.jsx`: ExtendScript host integration for Premiere
 - `SKILL.md`: Hermes skill definition for the cleanup workflow
 
+## Platform Support
+
+This repo currently supports macOS only.
+
+Windows and Linux are not supported in the current setup. The CEP install path, helper shell scripts, `python3` command usage, and `/dev/null`-based ffmpeg probing are all wired for macOS-style local environments.
+
 ## Requirements
 
 - macOS
@@ -104,6 +110,12 @@ python3 -m pip install --user --break-system-packages -r requirements.txt
 ```
 
 Make sure Hermes Agent is installed and working on your machine.
+
+Official Hermes Agent repo:
+
+`https://github.com/NousResearch/hermes-agent`
+
+These install commands assume a macOS machine with Homebrew available.
 
 Enable CEP debug mode and install the panel:
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionList>
-  <Extension Id="com.ufukyaman.adobeprrr.cep.panel">
+  <Extension Id="com.hermesagent.premierevideoeditor.cep.panel">
     <HostList>
       <Host Name="PPRO" Port="8891" />
     </HostList>
